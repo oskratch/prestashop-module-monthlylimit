@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module>
+
+    <name>monthlylimit</name>
+
+    <displayName><![CDATA[Monthly Limit]]></displayName>
+
+    <description><![CDATA[Este módulo permite controlar las compras mensuales de los empleados en la tienda estableciendo límites específicos. Define un importe máximo de compra mensual, el número máximo de veces que un empleado puede comprar cada mes o la cantidad total de productos que cada empleado puede adquirir mensualmente.]]></description>
+
+    <version>1.0.0</version>
+
+    <author>Oscar Periche</author>
+
+    <ps_versions_compliancy>
+
+        <min>8.2</min>
+
+        <max>8.2</max>
+
+    </ps_versions_compliancy>
+
+</module>
+
