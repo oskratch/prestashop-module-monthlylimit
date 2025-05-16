@@ -25,6 +25,4 @@ This module allows controlling the monthly purchases of employees in the store b
 If you need help or have questions about this module, you can contact `oskratch@gmail.com`.
 
 ## License
-This module is available under the **MIT** license, which allows its use, modification, and redistribution as long as the original copyright notice is retained.
-
-For more details, see the [LICENSE](LICENSE) file.
+This plugin is licensed under the GPLv2 or later. See [LICENSE](LICENSE) for details.
