@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.0.0...v1.1.0) (2025-08-25)
+
+
+### Features
+
+* add option to exclude customers from monthly limits ([16d627e](https://github.com/oskratch/prestashop-module-monthlylimit/commit/16d627ebe05273485fa0d9249eae8479d7193820))
+
 ## 1.0.0 (2025-05-30)
 
 
