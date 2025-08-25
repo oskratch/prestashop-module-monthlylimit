@@ -2,47 +2,54 @@
 
 class LimitManager {
 
-    private $monthlyLimitProducts; // Límit de productes per ID de producte
-    private $monthlyLimitEuros;    // Límit de despesa mensual en euros
-    private $monthlyLimitTimes;    // Límit de comandes mensuals
+    private $monthlyLimitProducts; // Product limit per product ID
+    private $monthlyLimitEuros;    // Monthly spending limit in euros
+    private $monthlyLimitTimes;    // Monthly order limit
+    private $excludedCustomers = [];
 
     public function __construct() {
         $this->monthlyLimitProducts = (int) Configuration::get('MONTHLY_LIMIT_PRODUCTS'); 
         $this->monthlyLimitEuros = (float) Configuration::get('MONTHLY_LIMIT_EUROS');
         $this->monthlyLimitTimes = (int) Configuration::get('MONTHLY_LIMIT_TIMES');
+        $excluded = Configuration::get('MONTHLY_LIMIT_EXCLUDED_CUSTOMERS');
+        $this->excludedCustomers = $excluded ? explode(',', $excluded) : [];
     }
 
-    // Comprovació de límit de productes per ID durant el mes
+    // Check monthly product limit per product ID
     public function checkMonthlyLimitProducts($cart, $customerId, $productId, $quantityChange, $operator = 'up') {
+        // If the customer is excluded, no limit applies
+        if (in_array($customerId, $this->excludedCustomers)) {
+            return false;
+        }
 
         if ($this->monthlyLimitProducts == 0) {
-            return false; // Si el límit és 0, no hi ha límit
+            return false; // If the limit is 0, there is no limit
         }
     
-        // Obtenim la quantitat actual d'aquest producte al carro
+        // Get the current quantity of this product in the cart
         $cartProductQuantities = $this->getCartProductQuantities($cart);
         $quantityInCart = isset($cartProductQuantities[$productId]) ? $cartProductQuantities[$productId] : 0;
     
-        // Obtenim la quantitat total comprada d'aquest producte durant el mes actual
+        // Get the total quantity bought of this product during the current month
         $totalQuantityBoughtThisMonth = $this->getTotalProductQuantityBoughtThisMonth($productId, $customerId);
     
-        // Ajustem el canvi segons si és una suma o una resta
+        // Adjust the change depending on whether it's an addition or subtraction
         $quantityChange = ($operator === 'up' ? 1 : -1) * $quantityChange;
     
-        // Calcula la quantitat actualitzada del producte
+        // Calculate the updated quantity of the product
         $totalQuantityForProduct = $totalQuantityBoughtThisMonth + $quantityInCart + $quantityChange;
     
-        // Comprovem si s'ha superat el límit
+        // Check if the limit has been exceeded
         if ($totalQuantityForProduct > $this->monthlyLimitProducts) {
-            // Calculem quanta quantitat es pot afegir per no superar el límit
+            // Calculate how much quantity can be added without exceeding the limit
             $remainingQuantity = $this->monthlyLimitProducts - $totalQuantityBoughtThisMonth - $quantityInCart;
     
-            // Si no es pot afegir cap unitat més, no mostrem la part de la quantitat restant
+            // If no more units can be added, do not show the remaining quantity part
             if ($remainingQuantity <= 0) {
                 return $this->l('Has superado el límite de compras de este producto durante el mes.');
             }
     
-            // Si encara es poden afegir unitats, mostrem la quantitat restant que es pot comprar
+            // If units can still be added, show the remaining quantity that can be purchased
             $unit_word = $remainingQuantity == 1 ? 'unidad' : 'unidades';
             return $this->l(
                 'Has superado el límite de compras de este producto durante el mes. Puedes comprar ' . 
@@ -50,43 +57,47 @@ class LimitManager {
             );
         }
     
-        return false; // Si no s'ha superat cap límit
+        return false; // If no limit has been exceeded
     }    
 
-    // Comprovació de límit de despesa mensual en euros
+    // Check monthly spending limit in euros
     public function checkMonthlyLimitEuros($cart, $customerId, $productId, $quantityChange, $operator = 'up') {
+        // If the customer is excluded, no limit applies
+        if (in_array($customerId, $this->excludedCustomers)) {
+            return false;
+        }
 
         if ($this->monthlyLimitEuros == 0) {
-            return false; // Si el límit és 0, no hi ha límit
+            return false; // If the limit is 0, there is no limit
         }
         
-        // Obtenim el total de la cistella actual
+        // Get the total of the current cart
         $cartTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
     
-        // Obtenim el preu del producte
+        // Get the price of the product
         $productPrice = $this->getProductPrice($productId, $cart->id_currency); 
     
-        // Si l'acció és afegir, sumem la quantitat; si és eliminar, restem la quantitat
+        // If the action is add, sum the quantity; if remove, subtract the quantity
         $additionalCost = ($operator == 'up' ? 1 : -1) * $productPrice * $quantityChange;
     
-        // Actualitzem el total de la cistella tenint en compte el canvi (afegir o eliminar)
+        // Update the cart total considering the change (add or remove)
         $updatedCartTotal = $cartTotal + $additionalCost;
     
-        // Comptem les compres anteriors d'aquest client
+        // Count previous purchases of this customer
         $totalSpentThisMonth = $this->getTotalSpentThisMonth($customerId);
     
-        // Calcula la despesa total amb la despesa actual de la cistella + les compres anteriors
+        // Calculate the total spending with the current cart + previous purchases
         $totalSpentForCustomer = $totalSpentThisMonth + $updatedCartTotal;
     
-        // Si la despesa total supera el límit, retornem un error
+        // If the total spending exceeds the limit, return an error
         if ($totalSpentForCustomer > $this->monthlyLimitEuros) {
-            // Calculem quant realment queda per gastar
+            // Calculate how much is actually left to spend
             $remainingLimit = $this->monthlyLimitEuros - ($totalSpentThisMonth + $cartTotal);
 
-            // Ajustem el límit restant a un mínim de 0
+            // Adjust the remaining limit to a minimum of 0
             $remainingLimit = max(0, $remainingLimit);
 
-            // Formatem el límit restant sense decimals innecessaris
+            // Format the remaining limit without unnecessary decimals
             $remainingLimitFormatted = number_format($remainingLimit, 2, ',', '.');
             if (fmod($remainingLimit, 1) === 0.0) {
                 $remainingLimitFormatted = number_format($remainingLimit, 0, ',', '.');
@@ -98,19 +109,23 @@ class LimitManager {
             );
         }
     
-        return false; // Tot correcte
+        return false; // All correct
     }    
 
-    // Comprovació de límit de nombre de comandes mensuals
+    // Check monthly order limit
     public function checkMonthlyLimitTimes($customerId) {
+        // If the customer is excluded, no limit applies
+        if (in_array($customerId, $this->excludedCustomers)) {
+            return false;
+        }
         if ($this->monthlyLimitTimes == 0) {
-            return false; // Si el límit és 0, no hi ha límit
+            return false; // If the limit is 0, there is no limit
         }
 
-        // Comptem les comandes fetes aquest mes
+        // Count the orders made this month
         $totalOrdersThisMonth = $this->getTotalOrdersThisMonth($customerId);
 
-        // Si el nombre de comandes supera el límit, retornem un error
+        // If the number of orders exceeds the limit, return an error
         if ($totalOrdersThisMonth >= $this->monthlyLimitTimes) {
             return $this->l('Has alcanzado el límite de pedidos para este mes.');
         }
@@ -118,7 +133,7 @@ class LimitManager {
         return false;
     }
 
-    // Recuperar les quantitats de productes de la cistella actual
+    // Retrieve product quantities from the current cart
     private function getCartProductQuantities($cart) {
         $productQuantities = [];
         foreach ($cart->getProducts() as $product) {
@@ -127,7 +142,7 @@ class LimitManager {
         return $productQuantities;
     }
 
-    // Recuperar la quantitat total de productes comprats d'un producte específic durant el mes
+    // Retrieve the total quantity of products bought of a specific product during the month
     private function getTotalProductQuantityBoughtThisMonth($productId, $customerId) {
         $sql = 'SELECT SUM(product_quantity) FROM ' . _DB_PREFIX_ . 'order_detail 
                 JOIN ' . _DB_PREFIX_ . 'orders ON ' . _DB_PREFIX_ . 'orders.id_order = ' . _DB_PREFIX_ . 'order_detail.id_order 
@@ -135,34 +150,34 @@ class LimitManager {
                 AND ' . _DB_PREFIX_ . 'order_detail.product_id = ' . (int)$productId . ' 
                 AND YEAR(' . _DB_PREFIX_ . 'orders.date_add) = YEAR(CURDATE()) 
                 AND MONTH(' . _DB_PREFIX_ . 'orders.date_add) = MONTH(CURDATE())';
-        return (int) Db::getInstance()->getValue($sql); // Retorna la quantitat total comprada aquest mes
+        return (int) Db::getInstance()->getValue($sql); // Returns the total quantity bought this month
     }
 
-    // Recuperar la despesa total d'un client durant el mes en curs
+    // Retrieve the total spending of a customer during the current month
     private function getTotalSpentThisMonth($customerId) {
         $sql = 'SELECT SUM(total_paid) FROM ' . _DB_PREFIX_ . 'orders 
                 WHERE id_customer = ' . (int)$customerId . ' 
                 AND YEAR(date_add) = YEAR(CURDATE()) 
                 AND MONTH(date_add) = MONTH(CURDATE())';
-        return (float) Db::getInstance()->getValue($sql); // Retorna el total gastat aquest mes
+        return (float) Db::getInstance()->getValue($sql); // Returns the total spent this month
     }
 
-    // Recuperar el nombre total de comandes fetes per un client durant el mes
+    // Retrieve the total number of orders made by a customer during the month
     private function getTotalOrdersThisMonth($customerId) {
         $sql = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'orders 
                 WHERE id_customer = ' . (int)$customerId . ' 
                 AND YEAR(date_add) = YEAR(CURDATE()) 
                 AND MONTH(date_add) = MONTH(CURDATE())';
-        return (int) Db::getInstance()->getValue($sql); // Retorna el nombre de comandes aquest mes
+        return (int) Db::getInstance()->getValue($sql); // Returns the number of orders this month
     }
 
-    /// Recuperar el preu d'un producte
+    /// Retrieve the price of a product
     private function getProductPrice($productId, $currencyId) {
         $product = new Product($productId);
         return Product::getPriceStatic($product->id, true, null, 2, null, false, false, 1, false, null, $currencyId);
     }
 
-    // Funció per retornar el missatge d'error localitzat
+    // Function to return the localized error message
     private function l($message) {
         return $message;
     }

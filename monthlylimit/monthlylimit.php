@@ -26,8 +26,8 @@ class MonthlyLimit extends Module {
 
         parent::__construct();
 
-        $this->displayName = $this->l('Monthly Limit'); 
-        $this->description = $this->l('Este módulo permite controlar las compras mensuales de los empleados en la tienda estableciendo límites específicos. Define un importe máximo de compra mensual, el número máximo de veces que un empleado puede comprar cada mes o la cantidad total de cada uno de los productos que cada empleado puede adquirir mensualmente.');
+    $this->displayName = $this->l('Monthly Limit'); 
+    $this->description = $this->l('This module allows you to control employees monthly purchases in the shop by setting specific limits. Define a maximum monthly purchase amount, the maximum number of times an employee can buy each month, or the total quantity of each product that each employee can purchase monthly.');
     }
 
     public function install(){
@@ -35,8 +35,8 @@ class MonthlyLimit extends Module {
             return false;
         }
         
-        Configuration::updateValue('MONTHLY_LIMIT_EUROS', 0); // Limit purchase amount - 0 unlimited
-        Configuration::updateValue('MONTHLY_LIMIT_TIMES', 0); // Limit times - 0 unlimited
+    Configuration::updateValue('MONTHLY_LIMIT_EUROS', 0); // Limit purchase amount - 0 means unlimited
+    Configuration::updateValue('MONTHLY_LIMIT_TIMES', 0); // Limit times - 0 means unlimited
         
         if (!Db::getInstance()->execute('
             CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'monthlylimit_products_limit` (
