@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.1.0...v1.1.1) (2025-08-28)
+
+
+### Bug Fixes
+
+* **admin:** fixed the structure of the forms ([44a9388](https://github.com/oskratch/prestashop-module-monthlylimit/commit/44a93881f1bd03f9c073a4149c6c4807777decfb))
+
 ## [1.1.0](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.0.0...v1.1.0) (2025-08-25)
 
 
