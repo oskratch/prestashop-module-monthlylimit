@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.1.1...v1.1.2) (2025-09-08)
+
+
+### Bug Fixes
+
+* **product-limit:** use per-product monthly limits and improve README ([abe8245](https://github.com/oskratch/prestashop-module-monthlylimit/commit/abe82459cc8370782c149156400a6ec7d06c0a14))
+
 ## [1.1.1](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.1.0...v1.1.1) (2025-08-28)
 
 
