@@ -2,13 +2,11 @@
 
 class LimitManager {
 
-    private $monthlyLimitProducts; // Product limit per product ID
     private $monthlyLimitEuros;    // Monthly spending limit in euros
     private $monthlyLimitTimes;    // Monthly order limit
     private $excludedCustomers = [];
 
     public function __construct() {
-        $this->monthlyLimitProducts = (int) Configuration::get('MONTHLY_LIMIT_PRODUCTS'); 
         $this->monthlyLimitEuros = (float) Configuration::get('MONTHLY_LIMIT_EUROS');
         $this->monthlyLimitTimes = (int) Configuration::get('MONTHLY_LIMIT_TIMES');
         $excluded = Configuration::get('MONTHLY_LIMIT_EXCLUDED_CUSTOMERS');
@@ -22,8 +20,11 @@ class LimitManager {
             return false;
         }
 
-        if ($this->monthlyLimitProducts == 0) {
-            return false; // If the limit is 0, there is no limit
+        // Get the specific limit for this product from the database
+        $productLimit = $this->getProductLimit($productId);
+        
+        if ($productLimit == 0) {
+            return false; // If the limit is 0 or doesn't exist, there is no limit
         }
     
         // Get the current quantity of this product in the cart
@@ -40,9 +41,9 @@ class LimitManager {
         $totalQuantityForProduct = $totalQuantityBoughtThisMonth + $quantityInCart + $quantityChange;
     
         // Check if the limit has been exceeded
-        if ($totalQuantityForProduct > $this->monthlyLimitProducts) {
+        if ($totalQuantityForProduct > $productLimit) {
             // Calculate how much quantity can be added without exceeding the limit
-            $remainingQuantity = $this->monthlyLimitProducts - $totalQuantityBoughtThisMonth - $quantityInCart;
+            $remainingQuantity = $productLimit - $totalQuantityBoughtThisMonth - $quantityInCart;
     
             // If no more units can be added, do not show the remaining quantity part
             if ($remainingQuantity <= 0) {
@@ -175,6 +176,13 @@ class LimitManager {
     private function getProductPrice($productId, $currencyId) {
         $product = new Product($productId);
         return Product::getPriceStatic($product->id, true, null, 2, null, false, false, 1, false, null, $currencyId);
+    }
+
+    // Retrieve the specific limit for a product
+    private function getProductLimit($productId) {
+        $sql = 'SELECT quantity FROM ' . _DB_PREFIX_ . 'monthlylimit_products_limit WHERE id_product = ' . (int) $productId;
+        $limit = Db::getInstance()->getValue($sql);
+        return $limit ? (int) $limit : 0; // Returns 0 if no limit is set for this product
     }
 
     // Function to return the localized error message
