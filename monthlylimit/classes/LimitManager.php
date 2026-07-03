@@ -145,37 +145,39 @@ class LimitManager {
 
     // Retrieve the total quantity of products bought of a specific product during the month
     private function getTotalProductQuantityBoughtThisMonth($productId, $customerId) {
-        $sql = 'SELECT SUM(product_quantity) FROM ' . _DB_PREFIX_ . 'order_detail 
-                JOIN ' . _DB_PREFIX_ . 'orders ON ' . _DB_PREFIX_ . 'orders.id_order = ' . _DB_PREFIX_ . 'order_detail.id_order 
-                WHERE ' . _DB_PREFIX_ . 'orders.id_customer = ' . (int)$customerId . ' 
-                AND ' . _DB_PREFIX_ . 'order_detail.product_id = ' . (int)$productId . ' 
-                AND YEAR(' . _DB_PREFIX_ . 'orders.date_add) = YEAR(CURDATE()) 
+        $sql = 'SELECT SUM(product_quantity) FROM ' . _DB_PREFIX_ . 'order_detail
+                JOIN ' . _DB_PREFIX_ . 'orders ON ' . _DB_PREFIX_ . 'orders.id_order = ' . _DB_PREFIX_ . 'order_detail.id_order
+                WHERE ' . _DB_PREFIX_ . 'orders.id_customer = ' . (int)$customerId . '
+                AND ' . _DB_PREFIX_ . 'order_detail.product_id = ' . (int)$productId . '
+                AND ' . _DB_PREFIX_ . 'orders.valid = 1
+                AND YEAR(' . _DB_PREFIX_ . 'orders.date_add) = YEAR(CURDATE())
                 AND MONTH(' . _DB_PREFIX_ . 'orders.date_add) = MONTH(CURDATE())';
         return (int) Db::getInstance()->getValue($sql); // Returns the total quantity bought this month
     }
 
     // Retrieve the total spending of a customer during the current month
     private function getTotalSpentThisMonth($customerId) {
-        $sql = 'SELECT SUM(total_paid) FROM ' . _DB_PREFIX_ . 'orders 
-                WHERE id_customer = ' . (int)$customerId . ' 
-                AND YEAR(date_add) = YEAR(CURDATE()) 
+        $sql = 'SELECT SUM(total_paid) FROM ' . _DB_PREFIX_ . 'orders
+                WHERE id_customer = ' . (int)$customerId . '
+                AND valid = 1
+                AND YEAR(date_add) = YEAR(CURDATE())
                 AND MONTH(date_add) = MONTH(CURDATE())';
         return (float) Db::getInstance()->getValue($sql); // Returns the total spent this month
     }
 
     // Retrieve the total number of orders made by a customer during the month
     private function getTotalOrdersThisMonth($customerId) {
-        $sql = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'orders 
-                WHERE id_customer = ' . (int)$customerId . ' 
-                AND YEAR(date_add) = YEAR(CURDATE()) 
+        $sql = 'SELECT COUNT(*) FROM ' . _DB_PREFIX_ . 'orders
+                WHERE id_customer = ' . (int)$customerId . '
+                AND valid = 1
+                AND YEAR(date_add) = YEAR(CURDATE())
                 AND MONTH(date_add) = MONTH(CURDATE())';
         return (int) Db::getInstance()->getValue($sql); // Returns the number of orders this month
     }
 
-    /// Retrieve the price of a product
+    // Retrieve the price of a product
     private function getProductPrice($productId, $currencyId) {
-        $product = new Product($productId);
-        return Product::getPriceStatic($product->id, true, null, 2, null, false, false, 1, false, null, $currencyId);
+        return Product::getPriceStatic((int) $productId, true, null, 2, null, false, false, 1, false, null, $currencyId);
     }
 
     // Retrieve the specific limit for a product

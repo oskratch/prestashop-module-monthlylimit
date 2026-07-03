@@ -18,7 +18,7 @@ class MonthlyLimit extends Module {
     public function __construct(){
         $this->name = 'monthlylimit';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.1.2'; // x-release-please-version
         $this->author = 'Oscar Periche - 4funkies';
         $this->need_instance = 0;
 
@@ -160,10 +160,12 @@ class MonthlyLimit extends Module {
             $errorMessages[] = $errorProducts;
         }
         
-        // Comprovar límit de comandes
-        $errorTimes = $limitManager->checkMonthlyLimitTimes($customerId);
-        if ($errorTimes) {
-            $errorMessages[] = $errorTimes;
+        // Comprovar límit de comandes (només quan s'afegeix quantitat, mai en reduir/eliminar del carret)
+        if ($operator === 'up') {
+            $errorTimes = $limitManager->checkMonthlyLimitTimes($customerId);
+            if ($errorTimes) {
+                $errorMessages[] = $errorTimes;
+            }
         }
         
         if (!empty($errorMessages)) {
@@ -195,11 +197,19 @@ class MonthlyLimit extends Module {
     }
 
     public function hookActionProductUpdate($params) {
+        // actionProductUpdate fires on every product save (any tab), but the "quantity"
+        // field only gets submitted from the tab that renders our displayAdminProductsExtra
+        // field. Without this guard, saving the product from any other tab would silently
+        // reset the configured monthly limit back to 0.
+        if (!Tools::getIsset('quantity')) {
+            return;
+        }
+
         $productId = (int) $params['id_product'];
         $quantity = (int) Tools::getValue('quantity');
 
-        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'monthlylimit_products_limit (id_product, quantity) 
-                VALUES (' . $productId . ', ' . $quantity . ') 
+        $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'monthlylimit_products_limit (id_product, quantity)
+                VALUES (' . $productId . ', ' . $quantity . ')
                 ON DUPLICATE KEY UPDATE quantity = ' . $quantity;
 
         Db::getInstance()->execute($sql);
