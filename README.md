@@ -1,7 +1,7 @@
 
 # 🛒 MonthlyLimit - PrestaShop Module
 
-[![PrestaShop](https://img.shields.io/badge/PrestaShop-1.7.x%20%7C%201.8.x-blue)](https://www.prestashop.com/)
+[![PrestaShop](https://img.shields.io/badge/PrestaShop-8.2-blue)](https://www.prestashop.com/)
 [![PHP](https://img.shields.io/badge/PHP-7.2%2B-blue)](https://www.php.net/)
 [![License](https://img.shields.io/badge/License-GPL--2.0-green.svg)](LICENSE)
 
@@ -18,7 +18,7 @@ A powerful PrestaShop module that helps store owners control and restrict monthl
 
 ## 📋 Requirements
 
-- PrestaShop 1.7.x or 1.8.x
+- PrestaShop 8.2 (per `ps_versions_compliancy` in `config.xml`)
 - PHP 7.2 or higher
 - MySQL 5.6 or higher
 - jQuery (included by default in PrestaShop backoffice)
@@ -112,6 +112,3 @@ This project is licensed under the GPL-2.0 License - see the [LICENSE](LICENSE) 
 ⭐ **Found this module useful?** Give us a star on GitHub!
 
 Made with ❤️ by [oskratch](https://github.com/oskratch)
-
-## License
-This plugin is licensed under the GPLv2 or later. See [LICENSE](LICENSE) for details.
