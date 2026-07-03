@@ -1,7 +1,7 @@
 <link href="{$module_dir}assets/css/select2.min.css" rel="stylesheet" />
 <script src="{$module_dir}assets/js/select2.min.js"></script>
 <div class="alert alert-info">
-    <img src="../modules/monthlylimit/logo.png" style="float:left; margin-right:15px;" height="60">
+    <img src="{$module_dir}logo.png" style="float:left; margin-right:15px;" height="60">
     <p><strong>Información importante.</strong></p>
     <p>{l s='Si quieres desactivar un límite específico, introduce 0 en el campo correspondiente y se desactivará.'}</p>
 </div>
