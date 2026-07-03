@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.2.0...v1.2.1) (2026-07-03)
+
+
+### Miscellaneous Chores
+
+* move local-only ignore rule out of the tracked .gitignore ([b46b422](https://github.com/oskratch/prestashop-module-monthlylimit/commit/b46b422e61f789fce290b7feca0f84ef1df351b4))
+
 ## [1.2.0](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.1.2...v1.2.0) (2026-07-03)
 
 
