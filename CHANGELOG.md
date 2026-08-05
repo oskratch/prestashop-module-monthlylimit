@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.2.1...v1.2.2) (2026-08-05)
+
+
+### Bug Fixes
+
+* correct product pricing, admin tab registration and add PS9 compatibility ([c01bbf4](https://github.com/oskratch/prestashop-module-monthlylimit/commit/c01bbf42c1d71083723c839d96b484bd888937b1))
+
 ## [1.2.1](https://github.com/oskratch/prestashop-module-monthlylimit/compare/v1.2.0...v1.2.1) (2026-07-03)
 
 
