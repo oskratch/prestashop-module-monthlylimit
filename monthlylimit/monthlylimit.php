@@ -7,14 +7,6 @@ require_once(_PS_MODULE_DIR_.'monthlylimit/classes/LimitManager.php');
 
 class MonthlyLimit extends Module {
 
-    public $tabs = [
-        [
-            'name' => 'Límites mensuales',
-            'class_name' => 'AdminLimitOrders',
-            'parent_class_name' => 'AdminParentOrders'
-        ],
-    ];
-
     public function __construct(){
         $this->name = 'monthlylimit';
         $this->tab = 'administration';
@@ -62,11 +54,17 @@ class MonthlyLimit extends Module {
             return false;
         }
 
-        // Copy custom.js to theme to override default behaviour
-        $activeTheme = Configuration::get('PS_THEME_NAME');
+        // Copy custom.js to theme to override default behaviour.
+        // _PS_THEME_DIR_ already points to the active theme's directory
+        // (themes/<theme_name>/); some themes (e.g. Hummingbird) don't ship
+        // an assets/js/ folder by default, so it must be created first or
+        // copy() fails.
+        $jsThemeDir = _PS_THEME_DIR_.'assets/js/';
+        if (!is_dir($jsThemeDir)) {
+            mkdir($jsThemeDir, 0755, true);
+        }
         $source = _PS_MODULE_DIR_.'monthlylimit/assets/js/custom.js';
-        $destination = _PS_THEME_DIR_.$activeTheme.'/assets/js/custom.js';
-        copy($source, $destination);
+        copy($source, $jsThemeDir.'custom.js');
 
         return true;
     }
@@ -77,8 +75,7 @@ class MonthlyLimit extends Module {
         }
 
         // Delete custom.js from theme
-        $activeTheme = Configuration::get('PS_THEME_NAME');
-        $destination = _PS_THEME_DIR_.$activeTheme.'/assets/js/custom.js';
+        $destination = _PS_THEME_DIR_.'assets/js/custom.js';
         if (file_exists($destination)) {
             unlink($destination);
         }
@@ -111,7 +108,7 @@ class MonthlyLimit extends Module {
         $tab->class_name = 'AdminLimitOrdersController'; 
         $tab->name = array();
         foreach (Language::getLanguages() as $lang) {
-            $tab->name[$lang['id_lang']] = $this->trans('Pendientes de aprobación', array(), 'Modules.MonthlyLimit.Admin', $lang['locale']);
+            $tab->name[$lang['id_lang']] = $this->trans('Límites mensuales', array(), 'Modules.MonthlyLimit.Admin', $lang['locale']);
         }
         $tab->id_parent = (int) Tab::getIdFromClassName('AdminParentOrders'); 
         $tab->module = $this->name;

@@ -76,7 +76,7 @@ class LimitManager {
         $cartTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
     
         // Get the price of the product
-        $productPrice = $this->getProductPrice($productId, $cart->id_currency); 
+        $productPrice = $this->getProductPrice($productId);
     
         // If the action is add, sum the quantity; if remove, subtract the quantity
         $additionalCost = ($operator == 'up' ? 1 : -1) * $productPrice * $quantityChange;
@@ -138,7 +138,10 @@ class LimitManager {
     private function getCartProductQuantities($cart) {
         $productQuantities = [];
         foreach ($cart->getProducts() as $product) {
-            $productQuantities[$product['id_product']] = $product['quantity'];
+            $id = $product['id_product'];
+            // A product can appear as several cart lines (one per combination),
+            // so quantities must be accumulated, not overwritten.
+            $productQuantities[$id] = (isset($productQuantities[$id]) ? $productQuantities[$id] : 0) + $product['quantity'];
         }
         return $productQuantities;
     }
@@ -176,8 +179,8 @@ class LimitManager {
     }
 
     // Retrieve the price of a product
-    private function getProductPrice($productId, $currencyId) {
-        return Product::getPriceStatic((int) $productId, true, null, 2, null, false, false, 1, false, null, $currencyId);
+    private function getProductPrice($productId) {
+        return Product::getPriceStatic((int) $productId, true, null, 2, null, false, false, 1);
     }
 
     // Retrieve the specific limit for a product
