@@ -1,114 +1,88 @@
-
-# 🛒 MonthlyLimit - PrestaShop Module
+# MonthlyLimit
 
 [![PrestaShop](https://img.shields.io/badge/PrestaShop-8.2%20--%209.1-blue)](https://www.prestashop.com/)
 [![PHP](https://img.shields.io/badge/PHP-7.2%2B-blue)](https://www.php.net/)
 [![License](https://img.shields.io/badge/License-GPL--2.0-green.svg)](LICENSE)
 
-A powerful PrestaShop module that helps store owners control and restrict monthly purchases for customers (especially useful for employee stores or B2B environments).
+PrestaShop module that limits how much each customer can buy per month. It was built for employee shops and works for any B2B store that needs purchase caps.
 
-## ✨ Features
+## Features
 
-- 💰 **Monthly spending limits**: Set maximum amounts customers can spend per month
-- 📦 **Order frequency limits**: Restrict the number of orders per customer per month  
-- 🎯 **Individual product limits**: Set specific quantity limits for each product per customer monthly
-- 👥 **Customer exclusions**: Exclude specific customers from all limits with an intuitive search interface
-- 🔍 **Advanced search**: Find and select customers easily using integrated Select2 search functionality
-- 🌐 **Multi-language support**: Fully translatable interface
+- **Monthly spending limit** per customer.
+- **Monthly order limit**: maximum number of orders per customer.
+- **Per-product limit**: maximum units of a product each customer can buy in a month.
+- **Exclusions**: customers who skip every limit, picked with a search field (name or email).
+- Translatable interface.
 
-## 📋 Requirements
+## Requirements
 
 - PrestaShop 8.2 – 9.1 (per `ps_versions_compliancy` in `config.xml`)
 - PHP 7.2 or higher
 - MySQL 5.6 or higher
-- No frontend JS framework required: works with jQuery-based themes (e.g. Classic) and native-fetch themes (e.g. Hummingbird/PrestaShop 9+) alike
+- Works with jQuery-based themes (e.g. Classic) and native-fetch themes (e.g. Hummingbird on PrestaShop 9+); no front-end framework required
 
-## 🚀 Installation
+## Installation
 
-1. **Download**: Clone this repository or download as ZIP
+1. Clone this repository or download it as a ZIP:
    ```bash
    git clone https://github.com/oskratch/prestashop-module-monthlylimit.git
    ```
+2. Compress the `monthlylimit/` folder into a `.zip` file.
+3. In the back office, go to **Modules and Services** → **Upload a module**, upload the `.zip` and enable the module.
 
-2. **Prepare**: Compress the `monthlylimit/` folder into a `.zip` file
+## Configuration
 
-3. **Install**: 
-   - Go to your PrestaShop admin panel
-   - Navigate to **Modules and Services** → **Upload a module**
-   - Upload the `.zip` file and activate the module
+### Global limits
 
-## ⚙️ Configuration
+Go to **Orders** → **Monthly Limits** and set:
 
-### Global Limits
-1. Go to **Orders** → **Monthly Limits** in your admin panel
-2. Configure global settings:
-   - **Monthly spending limit** (in euros, 0 = unlimited)
-   - **Monthly order limit** (number of orders, 0 = unlimited)
+- **Monthly spending limit** in euros (0 = no limit)
+- **Monthly order limit** (0 = no limit)
 
-### Product-Specific Limits
-1. Edit any product in your catalog
-2. Go to the **Modules** tab
-3. Find the **Monthly Limit** section
-4. Set the maximum units per customer per month (0 = unlimited)
+### Per-product limits
 
-### Customer Exclusions
-1. In the **Monthly Limits** configuration page
-2. Scroll to **Exclude customers from limits**
-3. Use the search field to find customers by name or email
-4. Select customers to exclude from ALL limits
-5. Click **Save exclusions**
+Edit a product, open the **Modules** tab and set the maximum units per customer per month in the **Monthly Limit** section (0 = no limit).
 
-## 📖 How It Works
+### Excluded customers
 
-The module checks purchase limits in real-time when customers add products to their cart:
+On the **Monthly Limits** page, scroll to **Exclude customers from limits**, search customers by name or email, select them and click **Save exclusions**. Excluded customers skip every limit.
 
-- **Monthly spending**: Tracks total spent by customer in current month
-- **Order frequency**: Counts number of completed orders in current month  
-- **Product limits**: Tracks quantities purchased per product per customer per month
-- **Exclusions**: Bypasses all checks for excluded customers
+## How it works
 
-## 🐛 Troubleshooting
+Limits are checked when a customer adds a product to the cart:
 
-### Common Issues
+- **Spending**: total spent by the customer in the current month.
+- **Orders**: completed orders in the current month.
+- **Products**: units of each product bought in the current month.
+- **Exclusions**: excluded customers are not checked.
 
-**Products showing wrong limits**
-- Ensure individual product limits are set correctly in product configuration
-- Check that the monthly limit values are greater than 0
+## Troubleshooting
 
-**Customers not being excluded properly**  
-- Verify customers are saved in the exclusion list
-- Clear PrestaShop cache after making changes
+**A product shows the wrong limit**
+- Check the limit set on the product, and that the value is greater than 0.
 
-**Limits not working**
-- Check that module hooks are properly installed
-- Verify database table `ps_monthlylimit_products_limit` exists
+**An excluded customer is still limited**
+- Check the customer is saved in the exclusion list, then clear the PrestaShop cache.
 
-## 📝 Changelog
+**Limits are not applied at all**
+- Check the module hooks are installed and the `ps_monthlylimit_products_limit` table exists.
 
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+## Changelog
 
-## 🤝 Contributing
+See [CHANGELOG.md](CHANGELOG.md).
 
-We welcome contributions! Please:
+## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Fork the repository.
+2. Create a branch (`git checkout -b feature/my-change`).
+3. Commit your changes.
+4. Push the branch and open a pull request.
 
-## 📞 Support
+## Support
 
-Need help? Contact us:
-- 📧 Email: oskratch@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/oskratch/prestashop-module-monthlylimit/issues)
+- Email: oskratch@gmail.com
+- Issues: [GitHub Issues](https://github.com/oskratch/prestashop-module-monthlylimit/issues)
 
-## 📄 License
+## License
 
-This project is licensed under the GPL-2.0 License - see the [LICENSE](LICENSE) file for details.
-
----
-
-⭐ **Found this module useful?** Give us a star on GitHub!
-
-Made with ❤️ by [oskratch](https://github.com/oskratch)
+GPL-2.0. See [LICENSE](LICENSE).
